@@ -11,8 +11,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $event = isset($_POST['event']) ? strip_tags(trim($_POST['event'])) : '';
 
     // Send email
-    $mail_to = 'jaipatadia@gmail.com'; // Your email here
-    $mail_subject = $subject != '' ? $subject : 'New Guest Attending your Wedding Event';
+    $to_email = 'jaipatadia@gmail.com'; // Your email here
+    $subject = $subject != '' ? $subject : 'New Guest Attending your Wedding Event';
 
     $message = '<h3>You got a new Guest Attending your Wedding Event:</h3>' . '<br/>';
     $message .= '<b>Name:</b> ' . $name . '<br/>';
@@ -35,39 +35,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $headers .= 'From: Wedding Invite <no-reply@wedding-invite.com>' . "\r\n";
 
     // Attempt to send email
-    if (mail($mail_to, $mail_subject, $message, $headers)) {
-        // Email sent successfully, now insert into database
-        
-        // Database configuration
-        $servername = "localhost";
-        $username = "bizzpsei_jai";
-        $password = "n9d-~[XSQepz";
-        $dbname = "bizzpsei_weddinginvite";
-
-        // Create connection
-        $conn = new mysqli($servername, $username, $password, $dbname);
-
-        // Check connection
-        if ($conn->connect_error) {
-            die("Connection failed: " . $conn->connect_error);
-        }
-
-        // Prepare and bind SQL statement
-        $stmt = $conn->prepare("INSERT INTO guests (name, email, mobile, event) VALUES (?, ?, ?, ?)");
-        $stmt->bind_param("ssss", $name, $email, $mobile, $event);
-
-        // Attempt to execute the SQL query
-        if ($stmt->execute()) {
-            // Close statement and database connection
-            $stmt->close();
-            $conn->close();
-            
-            // Return success response
-            echo json_encode(array('success' => true, 'message' => 'Email sent successfully and record inserted into database.'));
-        } else {
-            // Return error response
-            echo json_encode(array('success' => false, 'message' => 'Failed to insert record into database: ' . $conn->error));
-        }
+    if (mail($to_email, $subject, $message, $headers)) {
+        // Email sent successfully
+        echo json_encode(array('success' => true, 'message' => 'Email sent successfully.'));
     } else {
         // Return error response
         echo json_encode(array('success' => false, 'message' => 'Failed to send email. Please try again later.'));
